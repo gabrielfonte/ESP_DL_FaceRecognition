@@ -1,0 +1,21 @@
+{
+    "project_name":       "bootloader",
+    "project_path":       "/home/gabriel/EspressIf/esp-idf/components/bootloader/subproject",
+    "build_dir":          "/home/gabriel/Workspaces/Eclipse/ESP_DL_FaceRecognition/build/bootloader",
+    "config_file":        "/home/gabriel/Workspaces/Eclipse/ESP_DL_FaceRecognition/sdkconfig",
+    "config_defaults":    "",
+    "app_elf":            "bootloader.elf",
+    "app_bin":            "bootloader.bin",
+    "git_revision":       "v4.4-dev-3703-gddc44956bf",
+    "target":             "esp32",
+    "rev":                "0",
+    "phy_data_partition": "",
+    "monitor_baud" :      "115200",
+    "monitor_toolprefix": "xtensa-esp32-elf-",
+    "config_environment" : {
+        "COMPONENT_KCONFIGS" : "/home/gabriel/EspressIf/esp-idf/components/efuse/Kconfig;/home/gabriel/EspressIf/esp-idf/components/esp32/Kconfig;/home/gabriel/EspressIf/esp-idf/components/esp_common/Kconfig;/home/gabriel/EspressIf/esp-idf/components/esp_hw_support/Kconfig;/home/gabriel/EspressIf/esp-idf/components/esp_system/Kconfig;/home/gabriel/EspressIf/esp-idf/components/freertos/Kconfig;/home/gabriel/EspressIf/esp-idf/components/hal/Kconfig;/home/gabriel/EspressIf/esp-idf/components/log/Kconfig;/home/gabriel/EspressIf/esp-idf/components/newlib/Kconfig;/home/gabriel/EspressIf/esp-idf/components/spi_flash/Kconfig",
+        "COMPONENT_KCONFIGS_PROJBUILD" : "/home/gabriel/EspressIf/esp-idf/components/bootloader/Kconfig.projbuild;/home/gabriel/EspressIf/esp-idf/components/esp_rom/Kconfig.projbuild;/home/gabriel/EspressIf/esp-idf/components/esptool_py/Kconfig.projbuild;/home/gabriel/EspressIf/esp-idf/components/partition_table/Kconfig.projbuild"
+    },
+    "build_components" : [ "bootloader", "bootloader_support", "efuse", "esp32", "esp_common", "esp_hw_support", "esp_rom", "esp_system", "esptool_py", "freertos", "hal", "log", "main", "micro-ecc", "newlib", "partition_table", "soc", "spi_flash", "xtensa", "" ],
+    "build_component_paths" : [ "/home/gabriel/EspressIf/esp-idf/components/bootloader", "/home/gabriel/EspressIf/esp-idf/components/bootloader_support", "/home/gabriel/EspressIf/esp-idf/components/efuse", "/home/gabriel/EspressIf/esp-idf/components/esp32", "/home/gabriel/EspressIf/esp-idf/components/esp_common", "/home/gabriel/EspressIf/esp-idf/components/esp_hw_support", "/home/gabriel/EspressIf/esp-idf/components/esp_rom", "/home/gabriel/EspressIf/esp-idf/components/esp_system", "/home/gabriel/EspressIf/esp-idf/components/esptool_py", "/home/gabriel/EspressIf/esp-idf/components/freertos", "/home/gabriel/EspressIf/esp-idf/components/hal", "/home/gabriel/EspressIf/esp-idf/components/log", "/home/gabriel/EspressIf/esp-idf/components/bootloader/subproject/main", "/home/gabriel/EspressIf/esp-idf/components/bootloader/subproject/components/micro-ecc", "/home/gabriel/EspressIf/esp-idf/components/newlib", "/home/gabriel/EspressIf/esp-idf/components/partition_table", "/home/gabriel/EspressIf/esp-idf/components/soc", "/home/gabriel/EspressIf/esp-idf/components/spi_flash", "/home/gabriel/EspressIf/esp-idf/components/xtensa", "" ]
+}
