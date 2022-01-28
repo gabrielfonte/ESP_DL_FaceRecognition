@@ -4,7 +4,6 @@
 #include <vector>
 #include "dl_detect_define.hpp"
 
-
 class HumanFaceDetectMSR01
 {
 private:

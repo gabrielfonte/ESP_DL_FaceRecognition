@@ -5,7 +5,6 @@
 idf_component_register(
     SRCS
         "main.cpp"
-        "camera/image_provider.cc"
         "camera/app_camera_esp.c"
         "camera/utils.c"
         "websocket/websocket.cc"

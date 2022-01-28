@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <list>
+#include "dl_detect_define.hpp"
 
 class HumanFaceDetectMNP01
 {

@@ -11,13 +11,12 @@
 #include "freertos/task.h"
 #include "camera/utils.h"
 #include "camera/app_camera_esp.h"
-#include "camera/image_provider.h"
 #include "websocket/websocket.h"
 #include "wifi/wi-fi.h"
 #include "json/cjson.h"
 
 
-#define QUANT_TYPE 1 //1 for S16 model and 0 for S8
+#define QUANT_TYPE 0 //1 for S16 model and 0 for S8
 
 using namespace std;
 
@@ -27,55 +26,74 @@ using namespace std;
 
 static const char *TAG = "Main";
 
-HumanFaceDetectMSR01 s1(0.1F, 0.5F, 10, 1.16F);
-HumanFaceDetectMNP01 s2(0.5F, 0.3F, 5);
 
-#if QUANT_TYPE
-// S16 model
-FaceRecognition112V1S16 recognizer;
-#else
-	// S8 model
-	FaceRecognition112V1S8 recognizer;
-#endif
-
-/*
-uint8_t img_p[18432];
-*/
 #define IMAGE_SIZE 800*600
+#define CONFIG_S16 1
 
 using namespace std;
 
 websocket_client_config_t config;
 TaskHandle_t xCameraTaskHandle = NULL;
 
+static QueueHandle_t xQueueAIFrame = NULL;
+
+
+void Inference(uint16_t* img_p, int height, int width){
+
+    HumanFaceDetectMSR01 detector(0.3F, 0.3F, 10, 0.3F);
+    HumanFaceDetectMNP01 detector2(0.4F, 0.3F, 10);
+
+	#if CONFIG_S8
+		FaceRecognition112V1S8 *recognizer = new FaceRecognition112V1S8();
+	#elif CONFIG_S16
+		FaceRecognition112V1S16 *recognizer = new FaceRecognition112V1S16();
+	#endif
+
+	ESP_LOGI(TAG, "Inference initialized");
+
+	std::list<dl::detect::result_t> &detect_candidates = detector.infer(img_p, {height, width, 3});
+
+	std::list<dl::detect::result_t> &detect_results = detector2.infer(img_p, {height, width, 3}, detect_candidates);
+
+	ESP_LOGI(TAG, "Inference finished");
+
+    if(detect_results.size() == 1){
+    	ESP_LOGI(TAG, "Detected Face");
+    }
+    else{
+    	ESP_LOGI(TAG, "No Faces Detected");
+    }
+    //vector<int> landmarks_316_1 = results_316.front().keypoint;
+}
 
 void captureTask(void *pvParameters){
 
+    camera_fb_t *frame = NULL;
+
+	register_camera(PIXFORMAT_RGB565, FRAMESIZE_240X240, 2, xQueueAIFrame);
+
 	while(1){
 
-		uint8_t *img_p = (uint8_t *) heap_caps_malloc(IMAGE_SIZE*2, MALLOC_CAP_SPIRAM);
+		if(xQueueReceive(xQueueAIFrame, &frame, portMAX_DELAY)){
 
-		if(GetImage(800, 600, 3, img_p) != DLStatusOk){
-			ESP_LOGE(TAG, "Failed to Get Image");
+			/*
+			uint8_t *img_converted = (uint8_t *) heap_caps_malloc(frame->len*CONVERSION_PROPORTION, MALLOC_CAP_SPIRAM);
+			if(cvtImgRGB565ToRGB888(frame->buf, img_converted, IMAGE_SIZE*2) == 0){
+				printf("End of conversion\n");
+			}
+			*/
+			Inference((uint16_t*) frame->buf, (int) frame->height, (int) frame->width);
 		}
 
-		uint8_t *img_converted = (uint8_t *) heap_caps_malloc(IMAGE_SIZE*3, MALLOC_CAP_SPIRAM);
+		websocket_client_send(frame->buf, frame->len);
 
-		if(cvtImgRGB565ToRGB888(img_p, img_converted, IMAGE_SIZE*2) == 0){
-			printf("End of conversion\n");
-		}
+		esp_camera_fb_return(frame);
 
-		//json_pack_data(cvt_img, image_size, buffer);
+		vTaskDelay(pdMS_TO_TICKS(10));
 
-		websocket_client_send(img_converted, IMAGE_SIZE*3);
-		//websocket_client_send(img_converted, IMAGE_SIZE*3);
-
-		//ClearBuffer();
-
-		free(img_p);
-		free(img_converted);
 	}
 }
+
 
 extern "C" void app_main(void)
 {
@@ -91,45 +109,11 @@ extern "C" void app_main(void)
 	websocket_init(&config);
 	websocket_client_start();
 
-	xTaskCreate(captureTask, "Capture", 12800, NULL, tskIDLE_PRIORITY, &xCameraTaskHandle);
+    xQueueAIFrame = xQueueCreate(2, sizeof(camera_fb_t *));
+
+	xTaskCreate(captureTask, "Capture", 4*1024, NULL, tskIDLE_PRIORITY, &xCameraTaskHandle);
 
 	while(1){
-
-		/*
-		uint8_t *img_p = (uint8_t *) heap_caps_malloc(IMAGE_SIZE*2, MALLOC_CAP_SPIRAM);
-
-		if(GetImage(160, 120, 3, img_p) != DLStatusOk){
-			ESP_LOGE(TAG, "Failed to Get Image");
-		}
-
-		uint8_t *img_converted = (uint8_t *) heap_caps_malloc(IMAGE_SIZE*3, MALLOC_CAP_SPIRAM);
-		if(cvtImgRGB565ToRGB888(img_p, img_converted, IMAGE_SIZE*2) == 0){
-			printf("End of conversion\n");
-		}
-
-		*/
-
-		//free(img_converted);
-
-		/*
-
-		ESP_LOGI(TAG, "Inference initialized");
-	    std::list<dl::detect::result_t> &candidates_316 = s1.infer(img_p, {96, 96, 3});
-
-	    vTaskDelay(2000/portTICK_PERIOD_MS);
-
-	    std::list<dl::detect::result_t> &results_316 = s2.infer(img_p, {96, 96, 3}, candidates_316);
-
-	    vTaskDelay(2000/portTICK_PERIOD_MS);
-
-		ESP_LOGI(TAG, "Inference finished");
-
-	    printf("results.size: %i, %u\n", candidates_316.size(), results_316.size());
-	    assert(results_316.size() == 1);
-	    //vector<int> landmarks_316_1 = results_316.front().keypoint;
-	     *
-	     *
-	     */
 
 		printf("\n=========== START HEAP =================\n\t"
 			   "Free heap: %d bytes \n\t"

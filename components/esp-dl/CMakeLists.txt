@@ -34,3 +34,4 @@ set(lib     libcat_face_detect.a
             libmfn.a
             libdl.a)
 target_link_libraries(${COMPONENT_TARGET}   INTERFACE   ${lib})
+

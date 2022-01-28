@@ -16,8 +16,23 @@ limitations under the License.
 #include "app_camera_esp.h"
 
 static const char *TAG = "app_camera";
+static QueueHandle_t xQueueFrameO = NULL;
 
-int app_camera_init() {
+static void task_process_handler(void *arg)
+{
+    while (true)
+    {
+        camera_fb_t *frame = esp_camera_fb_get();
+        if (frame)
+            xQueueSend(xQueueFrameO, &frame, portMAX_DELAY);
+    }
+}
+
+void register_camera(const pixformat_t pixel_fromat,
+                     const framesize_t frame_size,
+                     const uint8_t fb_count,
+                     const QueueHandle_t frame_o)
+{
 #if CONFIG_CAMERA_MODEL_ESP_EYE
   /* IO13, IO14 is designed for JTAG by default,
    * to use it as generalized input,
@@ -52,17 +67,16 @@ int app_camera_init() {
   config.pin_pwdn = PWDN_GPIO_NUM;
   config.pin_reset = RESET_GPIO_NUM;
   config.xclk_freq_hz = XCLK_FREQ;
-  config.pixel_format = CAMERA_PIXEL_FORMAT;
-  config.frame_size = CAMERA_FRAME_SIZE;
+  config.pixel_format = pixel_fromat;
+  config.frame_size = frame_size;
   config.jpeg_quality = 12;
-  config.fb_count = 1;
+  config.fb_count = fb_count;
   config.fb_location = CAMERA_FB_IN_PSRAM;
   config.grab_mode = CAMERA_GRAB_WHEN_EMPTY;
 
   esp_err_t err = esp_camera_init(&config);
   if (err != ESP_OK) {
     ESP_LOGE(TAG, "Camera init failed with error 0x%x", err);
-    return -1;
   }
 
   sensor_t *s = esp_camera_sensor_get();
@@ -73,10 +87,7 @@ int app_camera_init() {
       s->set_brightness(s, 1);  //up the blightness just a bit
       s->set_saturation(s, -2); //lower the saturation
   }
-  else if(s->id.PID == OV2640_PID){
-      s->set_brightness(s, 1);  //up the blightness just a bit
-      s->set_saturation(s, -2); //lower the saturation
-  }
 
-  return 0;
+  xQueueFrameO = frame_o;
+  xTaskCreatePinnedToCore(task_process_handler, TAG, 1 * 1024, NULL, 5, NULL, 1);
 }

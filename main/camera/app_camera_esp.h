@@ -21,6 +21,9 @@ limitations under the License.
 #include "esp_log.h"
 #include "esp_system.h"
 #include "sensor.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/queue.h"
 
 /**
  * PIXFORMAT_RGB565,    // 2BPP/RGB565
@@ -166,14 +169,16 @@ limitations under the License.
 #error "No camera module configured, please configure in menuconfig"
 #endif
 
-#define XCLK_FREQ 15000000
+#define XCLK_FREQ 12000000
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int app_camera_init();
-
+void register_camera(const pixformat_t pixel_fromat,
+                     const framesize_t frame_size,
+                     const uint8_t fb_count,
+                     const QueueHandle_t frame_o);
 #ifdef __cplusplus
 }
 #endif
