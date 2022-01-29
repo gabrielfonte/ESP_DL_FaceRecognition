@@ -169,7 +169,7 @@ limitations under the License.
 #error "No camera module configured, please configure in menuconfig"
 #endif
 
-#define XCLK_FREQ 12000000
+#define XCLK_FREQ 15000000
 
 #ifdef __cplusplus
 extern "C" {

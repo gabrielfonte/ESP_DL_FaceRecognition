@@ -24,6 +24,7 @@ extern "C" {
 #endif
 uint8_t cvtImgRGB565ToRGB888(uint8_t *img_input, uint8_t *img_output, uint32_t size);
 uint8_t cvtImgRGB565ToRGB888_16(uint16_t *img_input, uint8_t *img_output, uint32_t size);
+uint8_t cvtImgRGB565ToBGR888(uint8_t *img_input, uint8_t *img_output, uint32_t size);
 #ifdef __cplusplus
 }
 #endif

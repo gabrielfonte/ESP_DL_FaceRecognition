@@ -70,4 +70,8 @@
 /home/gabriel/Workspaces/Eclipse/ESP_DL_FaceRecognition/build/esp-idf/ulp/libulp.a
 /home/gabriel/Workspaces/Eclipse/ESP_DL_FaceRecognition/build/esp-idf/wifi_provisioning/libwifi_provisioning.a
 /home/gabriel/Workspaces/Eclipse/ESP_DL_FaceRecognition/build/esp-idf/esp32-camera/libesp32-camera.a
+/home/gabriel/Workspaces/Eclipse/ESP_DL_FaceRecognition/build/esp-idf/bus/libbus.a
+/home/gabriel/Workspaces/Eclipse/ESP_DL_FaceRecognition/build/esp-idf/screen/libscreen.a
+/home/gabriel/Workspaces/Eclipse/ESP_DL_FaceRecognition/build/esp-idf/fb_gfx/libfb_gfx.a
+/home/gabriel/Workspaces/Eclipse/ESP_DL_FaceRecognition/build/esp-idf/esp-modules/libesp-modules.a
 /home/gabriel/Workspaces/Eclipse/ESP_DL_FaceRecognition/build/esp-idf/main/libmain.a

@@ -70,4 +70,8 @@ $<TARGET_FILE:__idf_spiffs>
 $<TARGET_FILE:__idf_ulp>
 $<TARGET_FILE:__idf_wifi_provisioning>
 $<TARGET_FILE:__idf_esp32-camera>
+$<TARGET_FILE:__idf_bus>
+$<TARGET_FILE:__idf_screen>
+$<TARGET_FILE:__idf_fb_gfx>
+$<TARGET_FILE:__idf_esp-modules>
 $<TARGET_FILE:__idf_main>

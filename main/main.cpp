@@ -14,11 +14,18 @@
 #include "websocket/websocket.h"
 #include "wifi/wi-fi.h"
 #include "json/cjson.h"
-
+#include "app_httpd.hpp"
+#include "app_mdns.h"
+#include "app_wifi.h"
+#include "esp_log.h"
+#include "who_ai_utils.hpp"
+#include "dl_image.hpp"
+#include "fb_gfx.h"
 
 #define QUANT_TYPE 0 //1 for S16 model and 0 for S8
 
 using namespace std;
+using namespace dl;
 
 /* Model import */
 #include "human_face_detect_msr01.hpp"
@@ -26,9 +33,7 @@ using namespace std;
 
 static const char *TAG = "Main";
 
-
-#define IMAGE_SIZE 800*600
-#define CONFIG_S16 1
+#define CONFIG_S8 1
 
 using namespace std;
 
@@ -36,58 +41,128 @@ websocket_client_config_t config;
 TaskHandle_t xCameraTaskHandle = NULL;
 
 static QueueHandle_t xQueueAIFrame = NULL;
+static QueueHandle_t xQueueHttpFrame = NULL;
 
 
-void Inference(uint16_t* img_p, int height, int width){
+#if CONFIG_S8
+	FaceRecognition112V1S8 recognizer;
+#elif CONFIG_S16
+	FaceRecognition112V1S16 recognizer;
+#endif
+
+
+uint8_t Inference(uint8_t* img_p, int height, int width, std::list<dl::detect::result_t> *results){
 
     HumanFaceDetectMSR01 detector(0.3F, 0.3F, 10, 0.3F);
     HumanFaceDetectMNP01 detector2(0.4F, 0.3F, 10);
 
-	#if CONFIG_S8
-		FaceRecognition112V1S8 *recognizer = new FaceRecognition112V1S8();
-	#elif CONFIG_S16
-		FaceRecognition112V1S16 *recognizer = new FaceRecognition112V1S16();
-	#endif
-
 	ESP_LOGI(TAG, "Inference initialized");
 
 	std::list<dl::detect::result_t> &detect_candidates = detector.infer(img_p, {height, width, 3});
-
 	std::list<dl::detect::result_t> &detect_results = detector2.infer(img_p, {height, width, 3}, detect_candidates);
 
 	ESP_LOGI(TAG, "Inference finished");
 
     if(detect_results.size() == 1){
     	ESP_LOGI(TAG, "Detected Face");
+        //print_detection_result(detect_results);
+        //draw_detection_result(img_p, height, width, detect_results);
+        *results = detect_results;
+        return 1;
     }
     else{
     	ESP_LOGI(TAG, "No Faces Detected");
+    	return 0;
     }
-    //vector<int> landmarks_316_1 = results_316.front().keypoint;
+
+}
+
+void Recognize(uint8_t* img_p, int height, int width, std::list<dl::detect::result_t> detect_results){
+
+	/*
+	face_info_t recognize_result;
+	recognize_result = recognizer.recognize(img_p, {height, width, 3}, detect_results.front().keypoint);
+	ESP_LOGI("RECOGNIZE", "Face ID %i recognized: Probability %f", recognize_result.id, recognize_result.similarity);
+	*/
+}
+
+void EnrollIDtoFlash(uint8_t* img_p, int height, int width, std::list<dl::detect::result_t> detect_results, std::string name){
+
+	face_info_t recognize_result;
+    print_detection_result(detect_results);
+
+    vector<int> landmarks = detect_results.front().keypoint;
+    Tensor<uint8_t> image;
+
+    image.set_element(img_p).set_shape({112, 112, 3}).set_auto_free(false);
+
+    int id = recognizer.enroll_id(image, landmarks, name, false);
+
+    cout << "name: " << name << ", id: " << id << "\n";
+
+    recognize_result = recognizer.recognize(image);
+
+    ESP_LOGI("RECOGNIZE", "Face ID %i recognized: Probability %f", recognize_result.id, recognize_result.similarity);
+
+    /*
+    int id = recognizer.enroll_id(img_p, {height, width, 3}, detect_results.front().keypoint, name, false);
+    ESP_LOGI("ENROLL", "ID %d is enrolled", id);
+    */
 }
 
 void captureTask(void *pvParameters){
 
     camera_fb_t *frame = NULL;
+    camera_fb_t frame888 = {0};
+    uint8_t *buffer888 = NULL;
 
-	register_camera(PIXFORMAT_RGB565, FRAMESIZE_240X240, 2, xQueueAIFrame);
+	register_camera(PIXFORMAT_RGB565, FRAMESIZE_240X240, 1, xQueueAIFrame);
+    register_httpd(xQueueHttpFrame, NULL, false);
 
 	while(1){
 
 		if(xQueueReceive(xQueueAIFrame, &frame, portMAX_DELAY)){
 
-			/*
-			uint8_t *img_converted = (uint8_t *) heap_caps_malloc(frame->len*CONVERSION_PROPORTION, MALLOC_CAP_SPIRAM);
-			if(cvtImgRGB565ToRGB888(frame->buf, img_converted, IMAGE_SIZE*2) == 0){
+			frame888.len = (frame->len)*1.5;
+			frame888.format = PIXFORMAT_RGB888;
+			frame888.timestamp = frame->timestamp;
+			frame888.width = frame -> width;
+			frame888.height = frame -> height;
+
+			buffer888 = (uint8_t*) heap_caps_malloc(frame888.len, MALLOC_CAP_SPIRAM);
+
+			if(cvtImgRGB565ToBGR888(frame->buf, buffer888, frame->len) == 0){
 				printf("End of conversion\n");
 			}
-			*/
-			Inference((uint16_t*) frame->buf, (int) frame->height, (int) frame->width);
-		}
 
-		websocket_client_send(frame->buf, frame->len);
+			frame888.buf = buffer888;
+
+			std::list<dl::detect::result_t> detect_results;
+			string name = "Gabriel";
+
+
+			if(Inference((uint8_t*) frame888.buf, (int) frame888.height, (int) frame888.width, &detect_results)){
+
+				vTaskDelay(pdMS_TO_TICKS(1000));
+
+				EnrollIDtoFlash(frame888.buf, (int) frame888.height, (int) frame888.width, detect_results, name);
+
+				vTaskDelay(pdMS_TO_TICKS(1000));
+
+				//Recognize((uint16_t*) frame->buf, (int) frame->height, (int) frame->width, detect_results);
+			}
+
+		}
+		/*
+		if(xQueueSend(xQueueHttpFrame, &frame, portMAX_DELAY)){
+			esp_camera_fb_return(frame);
+		}
+		*/
+		websocket_client_send(frame888.buf, frame888.len);
 
 		esp_camera_fb_return(frame);
+
+		free(buffer888);
 
 		vTaskDelay(pdMS_TO_TICKS(10));
 
@@ -110,6 +185,13 @@ extern "C" void app_main(void)
 	websocket_client_start();
 
     xQueueAIFrame = xQueueCreate(2, sizeof(camera_fb_t *));
+    xQueueHttpFrame = xQueueCreate(2, sizeof(camera_fb_t *));
+
+    recognizer.set_partition(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_ANY, "fr");
+    recognizer.set_ids_from_flash();
+
+    //app_wifi_main();
+    //app_mdns_main();
 
 	xTaskCreate(captureTask, "Capture", 4*1024, NULL, tskIDLE_PRIORITY, &xCameraTaskHandle);
 
