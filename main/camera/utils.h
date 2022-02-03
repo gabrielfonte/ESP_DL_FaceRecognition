@@ -11,6 +11,7 @@
 #include "stdint.h"
 #include "stdio.h"
 #include "stdlib.h"
+#include "app_camera_esp.h"
 
 typedef struct{
     uint8_t r;
@@ -25,6 +26,8 @@ extern "C" {
 uint8_t cvtImgRGB565ToRGB888(uint8_t *img_input, uint8_t *img_output, uint32_t size);
 uint8_t cvtImgRGB565ToRGB888_16(uint16_t *img_input, uint8_t *img_output, uint32_t size);
 uint8_t cvtImgRGB565ToBGR888(uint8_t *img_input, uint8_t *img_output, uint32_t size);
+uint8_t cvtfbRGB565TofbBGR888(camera_fb_t *fb_input, camera_fb_t *fb_output);
+uint8_t cvtfbRGB565TofbRGB888(camera_fb_t *fb_input, camera_fb_t *fb_output);
 #ifdef __cplusplus
 }
 #endif

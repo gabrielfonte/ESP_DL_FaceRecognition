@@ -1,6 +1,6 @@
-set(CMAKE_HOST_SYSTEM "Linux-5.15.14-200.fc35.x86_64")
+set(CMAKE_HOST_SYSTEM "Linux-5.15.17-200.fc35.x86_64")
 set(CMAKE_HOST_SYSTEM_NAME "Linux")
-set(CMAKE_HOST_SYSTEM_VERSION "5.15.14-200.fc35.x86_64")
+set(CMAKE_HOST_SYSTEM_VERSION "5.15.17-200.fc35.x86_64")
 set(CMAKE_HOST_SYSTEM_PROCESSOR "x86_64")
 
 include("/home/gabriel/EspressIf/esp-idf/tools/cmake/toolchain-esp32.cmake")

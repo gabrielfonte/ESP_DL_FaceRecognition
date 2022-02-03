@@ -1,5 +1,5 @@
 # Name,   Type, SubType, Offset,  Size, Flags
 # Note: if you have increased the bootloader size, make sure to update the offsets to avoid overlap,,,,
-factory, app,  factory, 0x010000, 3900K,
-nvs,     data, nvs,     0x3DF000, 16K,
-fr,32,32,      0x3E3000, 68K,
+factory, app,  factory, 0x10000, 3860K,
+nvs,     data, nvs,, 16K,
+fr,      data,,, 128K,
