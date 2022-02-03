@@ -1,4 +1,0 @@
-source "/home/gabriel/EspressIf/esp-idf/components/bootloader/Kconfig.projbuild"
-source "/home/gabriel/EspressIf/esp-idf/components/esp_rom/Kconfig.projbuild"
-source "/home/gabriel/EspressIf/esp-idf/components/esptool_py/Kconfig.projbuild"
-source "/home/gabriel/EspressIf/esp-idf/components/partition_table/Kconfig.projbuild"
