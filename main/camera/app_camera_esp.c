@@ -17,21 +17,27 @@ limitations under the License.
 
 static const char *TAG = "app_camera";
 static QueueHandle_t xQueueFrameO = NULL;
+static SemaphoreHandle_t xframeSemaphore;
 
 static void task_process_handler(void *arg)
 {
     while (true)
     {
-        camera_fb_t *frame = esp_camera_fb_get();
-        if (frame)
-            xQueueSend(xQueueFrameO, &frame, portMAX_DELAY);
+    	if(xSemaphoreTake(xframeSemaphore, portMAX_DELAY)){
+            camera_fb_t *frame = esp_camera_fb_get();
+            if (frame){
+                xQueueSend(xQueueFrameO, &frame, portMAX_DELAY);
+            }
+            xSemaphoreGive(xframeSemaphore);
+    	}
     }
 }
 
 void register_camera(const pixformat_t pixel_fromat,
                      const framesize_t frame_size,
                      const uint8_t fb_count,
-                     const QueueHandle_t frame_o)
+                     const QueueHandle_t frame_o,
+					 const SemaphoreHandle_t frameSemaphore)
 {
 #if CONFIG_CAMERA_MODEL_ESP_EYE
   /* IO13, IO14 is designed for JTAG by default,
@@ -69,10 +75,10 @@ void register_camera(const pixformat_t pixel_fromat,
   config.xclk_freq_hz = XCLK_FREQ;
   config.pixel_format = pixel_fromat;
   config.frame_size = frame_size;
-  config.jpeg_quality = 12;
+  config.jpeg_quality = 10;
   config.fb_count = fb_count;
   config.fb_location = CAMERA_FB_IN_PSRAM;
-  config.grab_mode = CAMERA_GRAB_WHEN_EMPTY;
+  config.grab_mode = CAMERA_GRAB_LATEST;
 
   esp_err_t err = esp_camera_init(&config);
   if (err != ESP_OK) {
@@ -89,5 +95,6 @@ void register_camera(const pixformat_t pixel_fromat,
   }
 
   xQueueFrameO = frame_o;
+  xframeSemaphore = frameSemaphore;
   xTaskCreatePinnedToCore(task_process_handler, TAG, 1 * 1024, NULL, 5, NULL, 1);
 }

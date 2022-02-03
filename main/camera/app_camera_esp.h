@@ -24,6 +24,7 @@ limitations under the License.
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
+#include "freertos/semphr.h"
 
 /**
  * PIXFORMAT_RGB565,    // 2BPP/RGB565
@@ -169,7 +170,7 @@ limitations under the License.
 #error "No camera module configured, please configure in menuconfig"
 #endif
 
-#define XCLK_FREQ 12000000
+#define XCLK_FREQ 10000000
 
 #ifdef __cplusplus
 extern "C" {
@@ -178,7 +179,8 @@ extern "C" {
 void register_camera(const pixformat_t pixel_fromat,
                      const framesize_t frame_size,
                      const uint8_t fb_count,
-                     const QueueHandle_t frame_o);
+                     const QueueHandle_t frame_o,
+					 const SemaphoreHandle_t frameSemaphore);
 #ifdef __cplusplus
 }
 #endif

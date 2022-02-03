@@ -10,5 +10,7 @@ idf_component_register(
         "websocket/websocket.cc"
         "wifi/wi-fi.c"
         "json/cjson.cc"
-    PRIV_REQUIRES esp32-camera esp-dl spi_flash nvs_flash esp_websocket_client esp_wifi json
+        "detection/detection.cpp"
+        "recognizer/recognizer.cpp"
+    PRIV_REQUIRES esp32-camera esp-dl spi_flash nvs_flash mdns esp_websocket_client esp_http_server esp_wifi json nghttp esp-modules bus screen fb_gfx
     INCLUDE_DIRS "")
