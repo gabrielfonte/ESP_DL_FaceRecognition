@@ -1,7 +1,0 @@
-{
-    "idf.adapterTargetName": "esp32",
-    "cSpell.language": "en,pt-BR,en-US",
-    "[markdown]": {
-        "editor.quickSuggestions": true
-    }
-}
