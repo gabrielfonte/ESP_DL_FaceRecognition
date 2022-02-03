@@ -1,12 +1,11 @@
-# Blink Example
+# ESP DL Face Recognition
 
-(See the README.md file in the upper level 'examples' directory for more information about examples.)
+This project is a implementation of a face recognition system, designed to work with ESP32. It is based on the [ESP-IDF](https://github.com/espressif/esp-idf) framework and [ESP-DL](https://github.com/espressif/esp-dl) library and also [ESP-Camera](https://github.com/espressif/esp32-camera) library.
 
-This example demonstrates how to blink a LED using GPIO or RMT for the addressable LED, i.e. [WS2812](http://www.world-semi.com/Certifications/WS2812B.html).
+It also uses some utilities components of [ESP-WHO](https://github.com/espressif/esp-who) framework, which will be removed in a future release to provide better compatibility with different versions of ESP32 other than ESP-EYE.
 
-See the RMT examples in the [RMT Peripheral](../../peripherals/rmt) for more information about how to use it.
 
-## How to Use Example
+## How to Use
 
 Before project configuration and build, be sure to set the correct chip target using `idf.py set-target <chip_name>`.
 
@@ -14,31 +13,26 @@ Before project configuration and build, be sure to set the correct chip target u
 
 * A development board with ESP32/ESP32-S2/ESP32-S3/ESP32-C3 SoC (e.g., ESP32-DevKitC, ESP-WROVER-KIT, etc.)
 * A USB cable for Power supply and programming
+* A compatible camera such as OV2640, for image acquisition.
+* For larger frame sizes, you may need External RAM. 
 
-Some development boards use an addressable LED instead of a regular one. These development boards include:
+**Notes** It has been tested on an ESP-EYE DevKit (ESP32 Microcontroller with OV2640 Integrated Camera). For different versions, it needs to be tested. If you have any problems, create an issue describing and the needed changes will be implemented. 
 
-| Board                | LED type             | Pin                  |
-| -------------------- | -------------------- | -------------------- |
-| ESP32-C3-DevKitC-1   | Addressable          | GPIO8                |
-| ESP32-C3-DevKitM-1   | Addressable          | GPIO8                |
-| ESP32-S2-DevKitM-1   | Addressable          | GPIO18               |
-| ESP32-S2-Saola-1     | Addressable          | GPIO18               |
-| ESP32-S3-Addax-1     | Addressable          | GPIO48               |
-
-See [Development Boards](https://www.espressif.com/en/products/devkits) for more information about it.
 
 ### Configure the Project
 
 Open the project configuration menu (`idf.py menuconfig`). 
 
-In the `Example Configuration` menu:
+In the `Camera Pins` menu:
 
-* Select the LED type in the `Blink LED type` option.
-    * Use `GPIO` for regular LED blink.
-    * Use `RMT` for addressable LED blink.
-        * Use `RMT Channel` to select the RMT peripheral channel.
-* Set the GPIO number used for the signal in the `Blink GPIO number` option.
-* Set the blinking period in the `Blink period in ms` option.
+* Select a Camera from the list or enter the `Custom Camera Pinout` option
+
+In the `WiFi Configuration` menu:
+
+* Insert your SSID in `WiFi SSID` option
+* Insert your Password in `WiFi PASSWORD` option
+* If needed, you may want to change the number of connection retries on `Maximum Retry`
+
 
 ### Build and Flash
 
@@ -48,30 +42,3 @@ Run `idf.py -p PORT flash monitor` to build, flash and monitor the project.
 
 See the [Getting Started Guide](https://docs.espressif.com/projects/esp-idf/en/latest/get-started/index.html) for full steps to configure and use ESP-IDF to build projects.
 
-## Example Output
-
-As you run the example, you will see the LED blinking, according to the previously defined period. For the addressable LED, you can also change the LED color by setting the `pStrip_a->set_pixel(pStrip_a, 0, 16, 16, 16);` (LED Strip, Pixel Number, Red, Green, Blue) with values from 0 to 255 in the `blink.c` file.
-
-```
-I (315) example: Example configured to blink addressable LED!
-I (325) example: Turning the LED OFF!
-I (1325) example: Turning the LED ON!
-I (2325) example: Turning the LED OFF!
-I (3325) example: Turning the LED ON!
-I (4325) example: Turning the LED OFF!
-I (5325) example: Turning the LED ON!
-I (6325) example: Turning the LED OFF!
-I (7325) example: Turning the LED ON!
-I (8325) example: Turning the LED OFF!
-```
-
-Note: The color order could be different according to the LED model.
-
-The pixel number indicates the pixel position in the LED strip. For a single LED, use 0.
-
-## Troubleshooting
-
-* If the LED isn't blinking, check the GPIO or the LED type selection in the `Example Configuration` menu.
-
-For any technical queries, please open an [issue](https://github.com/espressif/esp-idf/issues) on GitHub. We will get back to you soon.
-# ESP_DL_FaceRecognition
