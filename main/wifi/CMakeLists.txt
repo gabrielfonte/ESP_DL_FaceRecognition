@@ -4,6 +4,6 @@
 #
 
 idf_component_register(
-    SRCS ""
-    PRIV_REQUIRES esp_wifi spi_flash nvs_flash
+    SRCS "wi-fi.c" "esp_mdns.c"
+    PRIV_REQUIRES esp_wifi spi_flash nvs_flash http mdns
     INCLUDE_DIRS "")

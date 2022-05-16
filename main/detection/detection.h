@@ -13,8 +13,9 @@
 #include <list>
 #include <vector>
 #include "../recognizer/recognizer.h"
+#include "../camera/utils.h"
 #include "esp_log.h"
-#include "who_ai_utils.hpp"
+//#include "who_ai_utils.hpp"
 #include "dl_image.hpp"
 #include "fb_gfx.h"
 

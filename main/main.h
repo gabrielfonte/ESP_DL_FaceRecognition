@@ -8,27 +8,40 @@
 #ifndef MAIN_MAIN_H_
 #define MAIN_MAIN_H_
 
-/* ESP-DL Face Reconition Project */
 #include <stdio.h>
 #include <iostream>
 #include <list>
+#include <string>
 #include <vector>
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/queue.h"
+#include "freertos/semphr.h"
+#include "freertos/portmacro.h"
 #include "camera/utils.h"
 #include "camera/app_camera_esp.h"
 #include "websocket/websocket.h"
 #include "wifi/wi-fi.h"
-#include "json/cjson.h"
-#include "app_httpd.hpp"
-#include "app_mdns.h"
-#include "app_wifi.h"
+#include "http/app_mdns.h"
+//#include "app_httpd.hpp"
+//#include "who_motion_detection.hpp"
+//#include "app_mdns.h"
+//#include "app_wifi.h"
 #include "esp_log.h"
-#include "who_ai_utils.hpp"
+//#include "who_ai_utils.hpp"
 #include "dl_image.hpp"
 #include "fb_gfx.h"
 #include "detection/detection.h"
-#include "recognizer/recognizer.h"
+#include "http/http_stream.h"
 
-#endif /* MAIN_MAIN_H_ */
+typedef struct{
+    uint16_t id;
+    std::string name;
+    uint8_t *img;
+    std::vector<int> shape;
+}new_person;
+
+/* ESP-DL Face Recognition Project */
+
+#endif

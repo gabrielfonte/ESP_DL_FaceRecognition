@@ -1,5 +1,4 @@
 #include "wi-fi.h"
-
 #include <stdio.h>
 
 static EventGroupHandle_t s_wifi_event_group;
@@ -40,6 +39,7 @@ void wifi_init_sta()
     esp_netif_create_default_wifi_sta();
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+    ESP_LOGI("WI-FI", "Trying to initialize wifi on parameters");
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
 
     esp_event_handler_instance_t instance_any_id;
@@ -54,7 +54,7 @@ void wifi_init_sta()
                                                         &event_handler,
                                                         NULL,
                                                         &instance_got_ip));
-
+    ESP_LOGI("WI-FI", "Wi-fi events handlers registered");
     wifi_config_t wifi_config = {
         .sta = {
             .ssid = ESP_WIFI_SSID,
@@ -72,6 +72,7 @@ void wifi_init_sta()
     };
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA) );
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config) );
+    ESP_LOGI("WI-FI", "Wi-fi config set");
     ESP_ERROR_CHECK(esp_wifi_start() );
 
     ESP_LOGI(TAG, "wifi_init_sta finished.");
@@ -95,6 +96,8 @@ void wifi_init_sta()
     } else {
         ESP_LOGE(TAG, "UNEXPECTED EVENT");
     }
+
+
 
     /* The event will not be processed after unregister */
     ESP_ERROR_CHECK(esp_event_handler_instance_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, instance_got_ip));

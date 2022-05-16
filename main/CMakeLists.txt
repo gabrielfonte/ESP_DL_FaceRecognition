@@ -6,11 +6,12 @@ idf_component_register(
     SRCS
         "main.cpp"
         "camera/app_camera_esp.c"
-        "camera/utils.c"
+        "camera/utils.cpp"
         "websocket/websocket.cc"
         "wifi/wi-fi.c"
-        "json/cjson.cc"
         "detection/detection.cpp"
         "recognizer/recognizer.cpp"
-    PRIV_REQUIRES esp32-camera esp-dl spi_flash nvs_flash mdns esp_websocket_client esp_http_server esp_wifi json nghttp esp-modules bus screen fb_gfx
+        "http/app_mdns.c"
+        "http/http_stream.cpp"
+    PRIV_REQUIRES esp32-camera esp-dl spi_flash json nvs_flash freertos esp_websocket_client esp_wifi fb_gfx esp_http_server mdns
     INCLUDE_DIRS "")

@@ -5,6 +5,7 @@
  *      Author: gabriel
  */
 #include "detection.h"
+#include "face_recognition_tool.hpp"
 
 using namespace std;
 using namespace dl;
@@ -31,7 +32,6 @@ uint8_t Inference(uint8_t* img_p, int height, int width, std::list<dl::detect::r
 
     if(detect_results.size() == 1){
     	ESP_LOGI(TAG, "Detected Face");
-        //draw_detection_result(img_p, height, width, detect_results);
         print_detection_result(detect_results);
         *results = detect_results;
         return 1;
@@ -68,3 +68,5 @@ uint8_t Inference(uint16_t* img_p, int height, int width, std::list<dl::detect::
     }
 
 }
+
+
